@@ -11,8 +11,22 @@ import Data.List (intersperse)
 
 import System.IO (hSetBuffering, stdout, stdin, BufferMode(NoBuffering))
 
+-- substitutions for printing
+
 prettyPrint :: Board -> IO ()
-prettyPrint = undefined
+prettyPrint board@(Board n grid)= do
+    putStrLn rowStr
+  where 
+    getRows = rows board
+    rowStr = map prettyRow getRows
+    prettyRow :: [Cell] -> String
+    prettyRow [] = ""
+    prettyRow (cell:row) = case cell of
+      Taken X -> "X" ++ prettyRow row
+      Taken O -> "O" ++ prettyRow row
+      Nothing -> "-" ++ prettyRow row
+
+
 
 -- The following reflect the suggested structure, but you can manage the game
 -- in any way you see fit.
