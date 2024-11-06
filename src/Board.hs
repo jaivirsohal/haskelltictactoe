@@ -9,7 +9,8 @@ data Board = Board Int [Cell] deriving (Eq, Show)
 
 -- | Returns an empty board with sides of the given length
 emptyBoard :: Int -> Board
-emptyBoard = undefined
+emptyBoard 0 = Board 0 []
+emptyBoard n =  Board n [Empty | x <- [1..n*n]]
 
 -- | Returns the rows of a given board.
 rows :: Board -> [[Cell]]
