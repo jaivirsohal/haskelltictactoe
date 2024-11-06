@@ -12,19 +12,9 @@ import Data.List (intersperse)
 import System.IO (hSetBuffering, stdout, stdin, BufferMode(NoBuffering))
 
 -- substitutions for printing
-
 prettyPrint :: Board -> IO ()
 prettyPrint board = do
   putStrLn (unlines (map (unwords . map show) (rows board)))
-
--- The following reflect the suggested structure, but you can manage the game
--- in any way you see fit.
-
--- You might like to use one of the following signatures, as per the spec.
--- but this is up to you.
---
--- doParseAction :: (String -> Maybe a) -> IO a
--- doParseAction :: String -> (String -> Maybe a) -> IO a
 
 -- | Repeatedly read a target board position and invoke tryMove until
 -- the move is successful (Just ...).
@@ -73,7 +63,7 @@ main = do
   putStrLn "Player X Starts!"
   playGame (emptyBoard (read n)) X
   putStrLn "Thanks for playing!"
-  disableBuffering -- don't remove!
+  disableBuffering
   return ()
 
 {-|
