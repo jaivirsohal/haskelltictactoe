@@ -14,19 +14,8 @@ import System.IO (hSetBuffering, stdout, stdin, BufferMode(NoBuffering))
 -- substitutions for printing
 
 prettyPrint :: Board -> IO ()
-prettyPrint board@(Board n grid)= do
-    putStrLn rowStr
-  where 
-    getRows = rows board
-    rowStr = map prettyRow getRows
-    prettyRow :: [Cell] -> String
-    prettyRow [] = ""
-    prettyRow (cell:row) = case cell of
-      Taken X -> "X" ++ prettyRow row
-      Taken O -> "O" ++ prettyRow row
-      Nothing -> "-" ++ prettyRow row
-
-
+prettyPrint board = do
+  putStrLn (unlines (map (unwords . map show) (rows board)))
 
 -- The following reflect the suggested structure, but you can manage the game
 -- in any way you see fit.
@@ -40,19 +29,50 @@ prettyPrint board@(Board n grid)= do
 -- | Repeatedly read a target board position and invoke tryMove until
 -- the move is successful (Just ...).
 takeTurn :: Board -> Player -> IO Board
-takeTurn = undefined
+takeTurn board player = do
+  prettyPrint board
+  putStrLn ("Player " ++ show player ++ ", enter your move: ")
+  position <- getLine
+  case parsePosition position of
+    Nothing -> do
+      putStrLn "Invalid move, try again."
+      takeTurn board player
+    Just pos -> case tryMove player pos board of
+      Nothing -> do
+        putStrLn "Invalid move, try again."
+        takeTurn board player
+      Just newBoard -> do
+        return newBoard
+
 
 -- | Manage a game by repeatedly: 1. printing the current board, 2. using
 -- takeTurn to return a modified board, 3. checking if the game is over,
 -- printing the board and a suitable congratulatory message to the winner
 -- if so.
 playGame :: Board -> Player -> IO ()
-playGame = undefined
-
+playGame board player = do
+  if gameOver board
+    then do 
+      prettyPrint board
+      putStrLn ("Player " ++ show (swap player) ++ " wins!")
+  -- this check has to go second as the game can be over when the board full
+  else if isBoardFull board
+    then do
+      prettyPrint board
+      putStrLn "Draw!"
+  else do
+    newBoard <- takeTurn board player
+    playGame newBoard (swap player)
+  
 -- | Print a welcome message, read the board dimension, invoke playGame and
 -- exit with a suitable message.
 main :: IO ()
 main = do
+  putStrLn "Welcome to TicTacToe! Choose the board dimension (nxn):"
+  n <- getLine
+  putStrLn "Player X Starts!"
+  playGame (emptyBoard (read n)) X
+  putStrLn "Thanks for playing!"
   disableBuffering -- don't remove!
   return ()
 

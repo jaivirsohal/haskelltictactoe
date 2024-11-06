@@ -14,6 +14,7 @@ tests :: TestTree
 tests = testGroup "tictactoe"
   [ testGroup "emptyBoard" (numberedTests emptyBoardTests)
   , testGroup "gameOver" (numberedTests gameOverTests)
+  , testGroup "isBoardFull" (numberedTests isBoardFullTests) -- new tests
   , testGroup "parsePosition" (numberedTests parsePositionTests)
   , testGroup "tryMove" (numberedTests tryMoveTests)
   ]
@@ -32,6 +33,13 @@ gameOverTests = [ gameOver testBoard1 --> True
                 , gameOver testBoard2 --> False
                 , gameOver testBoard3 --> True
                 ]
+
+isBoardFullTests :: [Assertion]
+isBoardFullTests = [ isBoardFull testBoard1 --> False
+                   , isBoardFull testBoard2 --> False
+                   , isBoardFull testBoard3 --> False
+                   , isBoardFull (Board 1 [Taken X]) --> True
+                   ]
 
 parsePositionTests :: [Assertion]
 parsePositionTests = [ parsePosition "0 2" --> Just (0,2)

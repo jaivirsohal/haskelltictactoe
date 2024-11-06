@@ -1,4 +1,4 @@
-module TicTacToe (gameOver, parsePosition, tryMove) where
+module TicTacToe (gameOver, isBoardFull, parsePosition, tryMove) where
 
 import Data.List (nub)
 import Text.Read (readMaybe)
@@ -16,7 +16,15 @@ gameOver board@(Board n grid) = diagWin || rowWin || colWin
           rowWin = checkWin (rows board) n
           colWin = checkWin (cols board) n
           checkWin :: [[Cell]] -> Int -> Bool
-          checkWin xss n = length [xs | xs <- xss, Empty `elem` xs] /= n
+          checkWin xss n = oWin || xWin
+            where
+              oWin = or [length (nub xs) == 1 && head xs == Taken O | xs <- xss]
+              xWin = or [length (nub xs) == 1 && head xs == Taken X | xs <- xss]
+
+-- function to check if the entrie board is full - used in Main.hs
+-- own tests added
+isBoardFull :: Board -> Bool
+isBoardFull (Board n grid) = and [not (isEmpty cell) | cell <- grid]
 
 --
 -- Moves must be of the form "row col" where row and col are integers
@@ -40,6 +48,7 @@ tryMove player pos@(i,j) board@(Board n grid)
     | valid = Just newBoard
     | otherwise = Nothing
     where index = i * n + j
+          withinBounds = i >= 0 && i <= n - 1 && j >= 0 && j <= n - 1
           withinIndex = (index >= 0) && (index <= length grid - 1)
-          valid = withinIndex && isEmpty (grid!!index)
+          valid = withinIndex && isEmpty (grid!!index) && withinBounds
           newBoard = Board n (replace index (Taken player) grid)
